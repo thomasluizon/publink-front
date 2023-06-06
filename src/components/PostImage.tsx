@@ -1,13 +1,14 @@
 import ImagePost from '@/models/ImagePost'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface IProps {
 	img: ImagePost
 }
 
-export default function Post({ img }: IProps) {
+export default function PostImage({ img }: IProps) {
 	return (
-		<a href={img.postUrl} key={img.url}>
+		<Link href={img.postUrl} key={img.url}>
 			<Image
 				className="rounded-full"
 				src={img.url}
@@ -20,6 +21,6 @@ export default function Post({ img }: IProps) {
 					objectFit: 'cover',
 				}}
 			/>
-		</a>
+		</Link>
 	)
 }

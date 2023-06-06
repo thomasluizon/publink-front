@@ -1,19 +1,19 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import Image from 'next/image'
 import ImagePost from '@/models/ImagePost'
-import Post from '@/components/Post'
+import PostImage from '@/components/PostImage'
 
 export default function Home() {
 	const title = 'Publink'
-	const imgUrl = 'Imagem xuize'
+	const alt = 'Imagem xuize'
 	const postUrl = '#'
 
 	const imageLinks: ImagePost[] = [
-		new ImagePost('https://i.imgur.com/rC7z7KP.png', imgUrl, postUrl),
-		new ImagePost('https://i.imgur.com/UICTg9A.png', imgUrl, postUrl),
-		new ImagePost('https://i.imgur.com/wOmkBgy.png', imgUrl, postUrl),
-		new ImagePost('https://i.imgur.com/sk0Ev2e.png', imgUrl, postUrl),
+		new ImagePost('https://i.imgur.com/rC7z7KP.png', alt, 1),
+		new ImagePost('https://i.imgur.com/UICTg9A.png', alt, 2),
+		new ImagePost('https://i.imgur.com/wOmkBgy.png', alt, 3),
+		new ImagePost('https://i.imgur.com/sk0Ev2e.png', alt, 4),
+		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt, 5),
 	]
 
 	return (
@@ -34,11 +34,10 @@ export default function Home() {
 				</div>
 			</header>
 			<main className="container mx-auto p-5">
-				<h2 className="text-3xl">Feed</h2>
-
+				<h2 className="text-3xl mb-5 ">Feed</h2>
 				<div className="flex flex-wrap gap-5 justify-between">
 					{imageLinks.map(img => (
-						<Post img={img} key={img.url} />
+						<PostImage img={img} key={img.url} />
 					))}
 				</div>
 			</main>
