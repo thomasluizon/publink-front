@@ -3,11 +3,14 @@ export default class ImagePost {
 	alt: string
 	postUrl: string
 	id: number
+	static count: number = 0
 
-	constructor(url: string, alt: string, id: number) {
+	constructor(url: string, alt: string) {
+		ImagePost.count++
+
 		this.url = url
 		this.alt = alt
-		this.id = id
-		this.postUrl = `/post/${id}`
+		this.id = ImagePost.count
+		this.postUrl = `/post/${this.id}`
 	}
 }
