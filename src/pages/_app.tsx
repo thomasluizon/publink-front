@@ -16,6 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
 					content="width=device-width, initial-scale=1.0"
 				/>
 				<link rel="icon" href="/imgs/favicon.png" />
+				<title>{title}</title>
 			</Head>
 			<header className="flex p-5 justify-between items-center container mx-auto">
 				<div className="flex items-center">
