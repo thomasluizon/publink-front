@@ -5,6 +5,7 @@ interface IProps {
 	imgUrl: string
 	imgAlt: string
 	imgWidth: number
+	roundedFull?: boolean
 }
 
 export default function ImageModel(props: IProps) {
@@ -12,7 +13,7 @@ export default function ImageModel(props: IProps) {
 		<Image
 			src={props.imgUrl}
 			alt={props.imgAlt}
-			className="rounded-lg mx-auto"
+			className={`${props.roundedFull ? 'rounded-full' : 'rounded-lg'}`}
 			width={props.imgWidth}
 			height={props.imgWidth}
 			style={{

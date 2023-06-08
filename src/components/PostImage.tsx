@@ -4,20 +4,23 @@ import Link from 'next/link'
 
 interface IProps {
 	img: ImagePost
+	imgWidth?: number
 }
 
-export default function PostImage({ img }: IProps) {
+export default function PostImage({ img, imgWidth }: IProps) {
+	const width = imgWidth || 300
+
 	return (
 		<Link href={img.postUrl} key={img.url}>
 			<Image
 				className="rounded-full"
 				src={img.url}
 				alt={img.alt}
-				width={300}
-				height={300}
+				width={width}
+				height={width}
 				draggable={false}
 				style={{
-					maxHeight: '300px',
+					maxHeight: `${width}px`,
 					objectFit: 'cover',
 				}}
 			/>

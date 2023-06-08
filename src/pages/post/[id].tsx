@@ -10,11 +10,13 @@ export default function Post({
 	return (
 		<div className="flex flex-col justify-center align-middle h-3/4 gap-11">
 			<h2 className="text-center text-3xl">{post.title}</h2>
-			<ImageModel
-				imgUrl={post.imgUrl}
-				imgAlt={post.imgAlt}
-				imgWidth={imgWidth}
-			/>
+			<div className="mx-auto">
+				<ImageModel
+					imgUrl={post.imgUrl}
+					imgAlt={post.imgAlt}
+					imgWidth={imgWidth}
+				/>
+			</div>
 			<div>
 				<h3 className="text-center text-lg">Você também pode gostar</h3>
 				<div className="flex gap-10 justify-center mt-5">
