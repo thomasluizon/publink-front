@@ -38,12 +38,7 @@ export default function Home() {
 	return (
 		<>
 			<Head>
-				<title>Publink</title>
-				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-				<meta
-					name="viewport"
-					content="width=device-width, initial-scale=1.0"
-				/>
+				<title>Publink - Feed</title>
 			</Head>
 			<h2 className="text-3xl mb-5">Feed</h2>
 			<div className="flex flex-wrap gap-5 justify-between">
