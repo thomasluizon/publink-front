@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Ref, RefAttributes } from 'react'
 import Image from 'next/image'
 
 interface IProps {
@@ -6,6 +6,7 @@ interface IProps {
 	imgAlt: string
 	imgWidth: number
 	roundedFull?: boolean
+	hidden?: boolean
 }
 
 export default function ImageModel(props: IProps) {
@@ -20,6 +21,7 @@ export default function ImageModel(props: IProps) {
 				maxHeight: `${props.imgWidth}px`,
 				objectFit: 'cover',
 			}}
+			hidden={props.hidden}
 		/>
 	)
 }
