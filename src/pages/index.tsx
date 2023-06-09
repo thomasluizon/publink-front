@@ -40,13 +40,15 @@ export default function Home() {
 			<Head>
 				<title>Publink - Feed</title>
 			</Head>
-			<h2 className="text-3xl mb-5">Feed</h2>
-			<div className="flex flex-wrap gap-5 justify-between">
-				<Link href="/post/create">
+			<div className="flex flex-wrap gap-5 justify-between items-center">
+				<Link
+					href="/post/create"
+					className="mx-auto fixed bottom-5 left-1/2 -translate-x-1/2 hover:scale-105 transition-all z-10"
+				>
 					<ImageModel
-						imgWidth={imageWidth}
+						imgWidth={imageWidth / 4}
 						imgAlt="Imagem de um símbolo de mais"
-						imgUrl="/imgs/plus.jpg"
+						imgUrl="/imgs/plus.png"
 						roundedFull
 					/>
 				</Link>

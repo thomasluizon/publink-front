@@ -11,9 +11,9 @@ export default function PostImage({ img, imgWidth }: IProps) {
 	const width = imgWidth || 300
 
 	return (
-		<Link href={img.postUrl} key={img.url}>
+		<Link href={img.postUrl} key={img.url} className="mx-auto">
 			<Image
-				className="rounded-full"
+				className="rounded-full z-0 hover:scale-105 transition-all"
 				src={img.url}
 				alt={img.alt}
 				width={width}

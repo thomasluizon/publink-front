@@ -29,8 +29,8 @@ export default function App({ Component, pageProps }: AppProps) {
 					</Link>
 				</div>
 				<div className="flex gap-5">
-					<Link href="/register">Register</Link>
-					<Link href="/login">Login</Link>
+					<Link href="/">Register</Link>
+					<Link href="/">Login</Link>
 				</div>
 			</header>
 			<main className="container mx-auto px-5 pb-10">

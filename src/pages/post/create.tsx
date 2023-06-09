@@ -19,10 +19,14 @@ export default function Create() {
 	const [imgUrl, setImgUrl] = useState('/a')
 	const imgWidth = 450
 
+	const [isLoading, setIsLoading] = useState(false)
+
 	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
 
 		if (!file) return
+
+		console.log(file)
 
 		const acceptedImageTypes = ['image/jpeg', 'image/png']
 
@@ -78,6 +82,8 @@ export default function Create() {
 			imgUrl,
 		}
 
+		setIsLoading(true)
+		setShowImg(false)
 		// fetch post api
 	}
 
@@ -96,14 +102,27 @@ export default function Create() {
 				<Input id="desc" label="Descrição" ref={descRef} />
 				<button
 					type="button"
-					className="border-2 rounded-md px-5 py-14 border-gray-400"
+					className="border-2 rounded-xl px-5 py-14 border-gray-400 hover:bg-logo hover:text-white hover:border-logo transition-colors"
 					onClick={() => fileInput.current?.click()}
 				>
 					Clique aqui para selecionar um arquivo (png ou jpeg)
 				</button>
+
 				{error ? (
 					<div className="text-red-600 border-2 p-3 rounded-xl border-red-600">
 						{errorMessage}
+					</div>
+				) : (
+					false
+				)}
+
+				{isLoading ? (
+					<div className="flex items-center justify-center p-3">
+						<div className="flex space-x-2 animate-pulse">
+							<div className="w-3 h-3 bg-logo rounded-full"></div>
+							<div className="w-3 h-3 bg-logo rounded-full"></div>
+							<div className="w-3 h-3 bg-logo rounded-full"></div>
+						</div>
 					</div>
 				) : (
 					false
@@ -116,7 +135,7 @@ export default function Create() {
 					hidden={!showImg}
 				/>
 
-				<button className="border-2 p-2 rounded-md hover:bg-gray-100">
+				<button className="border-2 p-2 rounded-xl hover:bg-logo hover:text-white hover:border-logo transition-colors">
 					Enviar
 				</button>
 			</form>
@@ -126,15 +145,13 @@ export default function Create() {
 
 const Input = React.forwardRef<HTMLInputElement, { label: string; id: string }>(
 	({ label, id }, ref) => (
-		<div className="flex w-full justify-between gap-3 items-center">
-			<label htmlFor={id}>{label}: </label>
-			<input
-				className="outline-none border-2 rounded-md border-gray-300 flex-1 p-1"
-				type="text"
-				id={id}
-				ref={ref}
-			/>
-		</div>
+		<input
+			className="outline-none border-2 rounded-xl border-gray-300 flex-1 p-4 text-center"
+			type="text"
+			id={id}
+			ref={ref}
+			placeholder={label}
+		/>
 	)
 )
 

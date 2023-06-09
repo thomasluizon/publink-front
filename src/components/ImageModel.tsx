@@ -7,6 +7,7 @@ interface IProps {
 	imgWidth: number
 	roundedFull?: boolean
 	hidden?: boolean
+	hover?: boolean
 }
 
 export default function ImageModel(props: IProps) {
@@ -14,7 +15,9 @@ export default function ImageModel(props: IProps) {
 		<Image
 			src={props.imgUrl}
 			alt={props.imgAlt}
-			className={`${props.roundedFull ? 'rounded-full' : 'rounded-lg'}`}
+			className={`${props.roundedFull ? 'rounded-full' : 'rounded-lg'} ${
+				props.hover ? 'transition-all hover:scale-105' : ''
+			}`}
 			width={props.imgWidth}
 			height={props.imgWidth}
 			style={{

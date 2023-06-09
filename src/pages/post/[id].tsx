@@ -32,6 +32,7 @@ export default function Post({
 									imgUrl={img.imgUrl}
 									imgAlt={img.imgAlt}
 									imgWidth={miniImgWidth}
+									hover
 								/>
 							</a>
 						))}
