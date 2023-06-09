@@ -33,12 +33,9 @@ export default function App({ Component, pageProps }: AppProps) {
 					<Link href="/login">Login</Link>
 				</div>
 			</header>
-			<main className="container mx-auto px-5">
+			<main className="container mx-auto px-5 pb-10">
 				<Component {...pageProps} />
 			</main>
-			<footer className="bg-black py-20 mt-6">
-				<p className="text-center text-xl text-white">{title}</p>
-			</footer>
 		</>
 	)
 }
