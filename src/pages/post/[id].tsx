@@ -1,6 +1,9 @@
 import ImageModel from '@/components/ImageModel'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
+import fetch from 'node-fetch'
+import https from 'https'
+import IPost from '@/interfaces/IPost'
 
 export default function Post({
 	post,
@@ -55,36 +58,39 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async context => {
 	const { id } = context.query
 
-	// fetch api by id
+	const url = `${process.env.API_URL}/Post/GetByIdAndRandom/${id}`
 
-	// fetch next images by id
+	const agent = new https.Agent({
+		rejectUnauthorized: false,
+	})
+
+	const res = await fetch(url, { agent })
+
+	const json = await res.json()
+
+	const posts = json as IPost[]
+
+	const firstPost = posts[0]
+
+	posts.shift()
+
+	const otherImages: IImage[] = []
+
+	posts.forEach(post => {
+		const img: IImage = {
+			imgUrl: post.imgUrl,
+			imgAlt: post.description,
+			link: `/post/${post.id}`,
+		}
+
+		otherImages.push(img)
+	})
 
 	const post: IPosts = {
-		title: 'Foto Teste',
-		imgUrl: 'https://i.imgur.com/drozwAm.jpeg',
-		imgAlt: 'Imagem teste',
-		otherImgs: [
-			{
-				imgUrl: 'https://i.imgur.com/rC7z7KP.png',
-				imgAlt: 'aaaa',
-				link: '/post/1',
-			},
-			{
-				imgUrl: 'https://i.imgur.com/UICTg9A.png',
-				imgAlt: 'aaaa',
-				link: '/post/2',
-			},
-			{
-				imgUrl: 'https://i.imgur.com/wOmkBgy.png',
-				imgAlt: 'aaaa',
-				link: '/post/3',
-			},
-			{
-				imgUrl: 'https://i.imgur.com/sk0Ev2e.png',
-				imgAlt: 'aaaa',
-				link: '/post/4',
-			},
-		],
+		title: firstPost.title,
+		imgUrl: firstPost.imgUrl,
+		imgAlt: firstPost.description,
+		otherImgs: otherImages,
 	}
 
 	return { props: { post } }

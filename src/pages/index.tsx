@@ -51,8 +51,6 @@ export const getServerSideProps: GetServerSideProps<{
 
 		const res = await fetch(url, { agent })
 
-		console.log(url)
-
 		const json = await res.json()
 
 		const posts = json as IPost[]
