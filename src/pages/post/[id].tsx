@@ -43,7 +43,7 @@ export default function Post({
 	)
 }
 
-interface IPost {
+interface IPosts {
 	title: string
 	imgUrl: string
 	imgAlt: string
@@ -51,7 +51,7 @@ interface IPost {
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	post: IPost
+	post: IPosts
 }> = async context => {
 	const { id } = context.query
 
@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 	// fetch next images by id
 
-	const post: IPost = {
+	const post: IPosts = {
 		title: 'Foto Teste',
 		imgUrl: 'https://i.imgur.com/drozwAm.jpeg',
 		imgAlt: 'Imagem teste',

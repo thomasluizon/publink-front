@@ -1,39 +1,18 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import ImagePost from '@/models/ImagePost'
 import PostImage from '@/components/PostImage'
 import ImageModel from '@/components/ImageModel'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import fetch from 'node-fetch'
+import https from 'https'
+import IPost from '@/interfaces/IPost'
 
-export default function Home() {
-	const alt = 'Imagem teste'
+export default function Home(props: {
+	posts: InferGetServerSidePropsType<typeof getServerSideProps>
+}) {
 	const imageWidth = 300
 
-	const imageLinks: ImagePost[] = [
-		new ImagePost('https://i.imgur.com/rC7z7KP.png', alt),
-		new ImagePost('https://i.imgur.com/UICTg9A.png', alt),
-		new ImagePost('https://i.imgur.com/wOmkBgy.png', alt),
-		new ImagePost('https://i.imgur.com/sk0Ev2e.png', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-		new ImagePost('https://i.imgur.com/drozwAm.jpeg', alt),
-	]
+	const posts = (props?.posts || []) as unknown as IPost[]
 
 	return (
 		<>
@@ -52,10 +31,36 @@ export default function Home() {
 						roundedFull
 					/>
 				</Link>
-				{imageLinks.map(img => (
-					<PostImage imgWidth={imageWidth} img={img} key={img.url} />
+				{posts.map((post: IPost) => (
+					<PostImage imgWidth={imageWidth} post={post} key={post.imgUrl} />
 				))}
 			</div>
 		</>
 	)
+}
+
+export const getServerSideProps: GetServerSideProps<{
+	posts: IPost[]
+}> = async context => {
+	const url = `${process.env.API_URL}/Post/GetAllRandomPosts`
+
+	try {
+		const agent = new https.Agent({
+			rejectUnauthorized: false,
+		})
+
+		const res = await fetch(url, { agent })
+
+		console.log(url)
+
+		const json = await res.json()
+
+		const posts = json as IPost[]
+
+		return { props: { posts } }
+	} catch (error) {
+		console.error('Error fetching data:', error)
+
+		return { props: { posts: [] } }
+	}
 }
