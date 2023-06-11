@@ -27,7 +27,13 @@ export default function Post({
 					imgWidth={imgWidth}
 				/>
 				<div>
-					<h3 className="text-center text-lg">Você também pode gostar</h3>
+					{post.otherImgs.length > 0 ? (
+						<h3 className="text-center text-lg">
+							Você também pode gostar
+						</h3>
+					) : (
+						false
+					)}
 					<div className="flex gap-10 justify-center mt-5">
 						{post.otherImgs.map(img => (
 							<a href={img.link} key={img.link}>
