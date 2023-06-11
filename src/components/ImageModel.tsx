@@ -1,15 +1,6 @@
 import React, { Ref, RefAttributes } from 'react'
 import Image from 'next/image'
 
-interface IProps {
-	imgUrl: string
-	imgAlt: string
-	imgWidth: number
-	roundedFull?: boolean
-	hidden?: boolean
-	hover?: boolean
-}
-
 export default function ImageModel(props: IProps) {
 	return (
 		<Image
@@ -27,4 +18,14 @@ export default function ImageModel(props: IProps) {
 			hidden={props.hidden}
 		/>
 	)
+}
+
+// Interfaces
+interface IProps {
+	imgUrl: string
+	imgAlt: string
+	imgWidth: number
+	roundedFull?: boolean
+	hidden?: boolean
+	hover?: boolean
 }

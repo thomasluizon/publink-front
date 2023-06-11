@@ -11,7 +11,6 @@ export default function Home(props: {
 	posts: InferGetServerSidePropsType<typeof getServerSideProps>
 }) {
 	const imageWidth = 300
-
 	const posts = (props?.posts || []) as unknown as IPost[]
 
 	return (

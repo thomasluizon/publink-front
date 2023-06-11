@@ -4,20 +4,11 @@ import IPost from '@/interfaces/IPost'
 import { useRouter } from 'next/router'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
-interface IPayload {
-	title: string
-	description: string
-	imgUrl: string
-}
-
 const compressImage = async (
 	file: File,
 	{ quality, type } = { quality: 1, type: file.type }
 ) => {
-	// Get as image data
 	const imageBitmap = await createImageBitmap(file)
-
-	// Draw to canvas
 	const canvas = document.createElement('canvas')
 
 	let width = imageBitmap.width
@@ -48,27 +39,29 @@ const compressImage = async (
 
 	ctx.drawImage(imageBitmap, 0, 0)
 
-	// Turn into Blob
 	return await new Promise(resolve => canvas.toBlob(resolve, type, quality))
 }
 
 export default function Create(props: {
 	apiUrl: InferGetServerSidePropsType<typeof getServerSideProps>
 }) {
+	const router = useRouter()
+
+	// Refs
 	const fileInput = useRef<HTMLInputElement>(null)
 	const titleRef = useRef<HTMLInputElement>(null)
 	const descRef = useRef<HTMLInputElement>(null)
-	const router = useRouter()
 
+	// States
 	const [error, setError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
-
 	const [showImg, setShowImg] = useState(false)
 	const [imgUrl, setImgUrl] = useState('/a')
-	const imgWidth = 450
-
 	const [isLoading, setIsLoading] = useState(false)
 
+	const imgWidth = 450
+
+	// Functions
 	const setGeneralError = () => {
 		setIsLoading(false)
 		setShowImg(false)
@@ -226,7 +219,10 @@ export default function Create(props: {
 					hidden={!showImg}
 				/>
 
-				<button className="border-2 p-2 rounded-xl hover:bg-logo hover:text-white hover:border-logo transition-colors">
+				<button
+					disabled={isLoading}
+					className="border-2 p-2 rounded-xl hover:bg-logo hover:text-white hover:border-logo transition-colors disabled:hover:bg-red-600"
+				>
 					Enviar
 				</button>
 			</form>
@@ -241,6 +237,14 @@ export const getServerSideProps: GetServerSideProps<{
 	return { props: { apiUrl } }
 }
 
+// Interfaces
+interface IPayload {
+	title: string
+	description: string
+	imgUrl: string
+}
+
+// Components
 const Input = React.forwardRef<HTMLInputElement, { label: string; id: string }>(
 	({ label, id }, ref) => (
 		<input

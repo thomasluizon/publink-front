@@ -52,13 +52,6 @@ export default function Post({
 	)
 }
 
-interface IPosts {
-	title: string
-	imgUrl: string
-	imgAlt: string
-	otherImgs: IImage[]
-}
-
 export const getServerSideProps: GetServerSideProps<{
 	post: IPosts
 }> = async context => {
@@ -100,6 +93,14 @@ export const getServerSideProps: GetServerSideProps<{
 	}
 
 	return { props: { post } }
+}
+
+// Interfaces
+interface IPosts {
+	title: string
+	imgUrl: string
+	imgAlt: string
+	otherImgs: IImage[]
 }
 
 interface IImage {
