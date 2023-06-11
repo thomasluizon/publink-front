@@ -6,12 +6,26 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import fetch from 'node-fetch'
 import https from 'https'
 import IPost from '@/interfaces/IPost'
+import { use, useContext, useEffect } from 'react'
+import AuthContext from '@/context/AuthContext'
+import { useRouter } from 'next/router'
 
 export default function Home(props: {
 	posts: InferGetServerSidePropsType<typeof getServerSideProps>
 }) {
+	const router = useRouter()
+
 	const imageWidth = 300
 	const posts = (props?.posts || []) as unknown as IPost[]
+
+	// States
+	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+
+	useEffect(() => {
+		if (!isLoggedIn) {
+			router.push('/login')
+		}
+	}, [isLoggedIn, router])
 
 	return (
 		<>
