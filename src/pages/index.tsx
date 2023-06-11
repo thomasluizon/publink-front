@@ -18,21 +18,31 @@ export default function Home(props: {
 			<Head>
 				<title>Publink - Feed</title>
 			</Head>
+			<Link
+				href="/post/create"
+				className="mx-auto fixed bottom-5 left-1/2 -translate-x-1/2 hover:scale-105 transition-all z-10"
+			>
+				<ImageModel
+					imgWidth={imageWidth / 4}
+					imgAlt="Imagem de um símbolo de mais"
+					imgUrl="/imgs/plus.png"
+					roundedFull
+				/>
+			</Link>
 			<div className="flex flex-wrap gap-5 justify-between items-center">
-				<Link
-					href="/post/create"
-					className="mx-auto fixed bottom-5 left-1/2 -translate-x-1/2 hover:scale-105 transition-all z-10"
-				>
-					<ImageModel
-						imgWidth={imageWidth / 4}
-						imgAlt="Imagem de um símbolo de mais"
-						imgUrl="/imgs/plus.png"
-						roundedFull
-					/>
-				</Link>
-				{posts.map((post: IPost) => (
-					<PostImage imgWidth={imageWidth} post={post} key={post.imgUrl} />
-				))}
+				{posts.length > 0 ? (
+					posts.map((post: IPost) => (
+						<PostImage
+							imgWidth={imageWidth}
+							post={post}
+							key={post.imgUrl}
+						/>
+					))
+				) : (
+					<h2 className="text-center w-full text-2xl">
+						Nenhuma imagem foi encontrada.
+					</h2>
+				)}
 			</div>
 		</>
 	)
