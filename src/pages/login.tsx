@@ -3,7 +3,13 @@ import Input from '@/components/Input'
 import AuthContext from '@/context/AuthContext'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useRouter } from 'next/router'
-import React, { FormEvent, useContext, useRef, useState } from 'react'
+import React, {
+	FormEvent,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 
 export default function Register(props: {
 	correctLogin: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -50,6 +56,12 @@ export default function Register(props: {
 
 		router.push('/')
 	}
+
+	useEffect(() => {
+		if (isLoggedIn) {
+			router.push('/')
+		}
+	}, [isLoggedIn, router])
 
 	return (
 		<div className="h-3/4 flex justify-center items-center">

@@ -1,4 +1,11 @@
-import React, { ChangeEvent, FormEvent, useRef, useState } from 'react'
+import React, {
+	ChangeEvent,
+	FormEvent,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 import ImageModel from '@/components/ImageModel'
 import IPost from '@/interfaces/IPost'
 import { useRouter } from 'next/router'
@@ -6,6 +13,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Input from '@/components/Input'
 import compressImage from '@/helpers/compressImage'
 import Button from '@/components/Button'
+import AuthContext from '@/context/AuthContext'
 
 export default function Create(props: {
 	apiUrl: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -25,6 +33,7 @@ export default function Create(props: {
 	const [imgUrl, setImgUrl] = useState('/a')
 
 	const [isLoading, setIsLoading] = useState(false)
+	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
 
 	const imgWidth = 450
 
@@ -137,6 +146,12 @@ export default function Create(props: {
 			return
 		}
 	}
+
+	useEffect(() => {
+		if (!isLoggedIn) {
+			router.push('/login')
+		}
+	}, [isLoggedIn, router])
 
 	return (
 		<div className="flex flex-col justify-center items-center h-3/4 gap-11">

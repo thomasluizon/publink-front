@@ -16,7 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	const handleLogout = () => {
 		setLoggedIn(false)
-		router.push('/')
+		router.push('/login')
 	}
 
 	return (
