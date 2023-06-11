@@ -116,8 +116,6 @@ export default function Create(props: {
 		}
 
 		reader.readAsDataURL(fileCompressed)
-
-		console.log(imgUrl)
 	}
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
