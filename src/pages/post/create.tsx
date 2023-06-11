@@ -1,5 +1,8 @@
 import React, { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import ImageModel from '@/components/ImageModel'
+import IPost from '@/interfaces/IPost'
+import { useRouter } from 'next/router'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 interface IPayload {
 	title: string
@@ -7,10 +10,55 @@ interface IPayload {
 	imgUrl: string
 }
 
-export default function Create() {
+const compressImage = async (
+	file: File,
+	{ quality, type } = { quality: 1, type: file.type }
+) => {
+	// Get as image data
+	const imageBitmap = await createImageBitmap(file)
+
+	// Draw to canvas
+	const canvas = document.createElement('canvas')
+
+	let width = imageBitmap.width
+	let height = imageBitmap.height
+
+	const maxWidth = 1280
+	const maxHeight = 720
+
+	if (width > maxWidth) {
+		let percentage = (maxWidth * 100) / width / 100
+
+		width = maxWidth
+
+		height *= percentage
+	} else if (height > maxHeight) {
+		let percentage = (maxHeight * 100) / height / 100
+
+		height = maxHeight
+
+		width *= percentage
+	}
+
+	canvas.width = imageBitmap.width
+	canvas.height = imageBitmap.height
+	const ctx = canvas.getContext('2d')
+
+	if (ctx == null) return
+
+	ctx.drawImage(imageBitmap, 0, 0)
+
+	// Turn into Blob
+	return await new Promise(resolve => canvas.toBlob(resolve, type, quality))
+}
+
+export default function Create(props: {
+	apiUrl: InferGetServerSidePropsType<typeof getServerSideProps>
+}) {
 	const fileInput = useRef<HTMLInputElement>(null)
 	const titleRef = useRef<HTMLInputElement>(null)
 	const descRef = useRef<HTMLInputElement>(null)
+	const router = useRouter()
 
 	const [error, setError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
@@ -21,12 +69,18 @@ export default function Create() {
 
 	const [isLoading, setIsLoading] = useState(false)
 
-	const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+	const setGeneralError = () => {
+		setIsLoading(false)
+		setShowImg(false)
+		setImgUrl('/a')
+		setErrorMessage('Error do servidor, tente novamente mais tarde!')
+		setError(true)
+	}
+
+	const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
 
 		if (!file) return
-
-		console.log(file)
 
 		const acceptedImageTypes = ['image/jpeg', 'image/png']
 
@@ -41,17 +95,32 @@ export default function Create() {
 
 		const reader = new FileReader()
 
+		const compressed = await compressImage(file, {
+			quality: 0.1,
+			type: 'image/jpeg',
+		})
+
+		const fileCompressed = compressed as File
+
 		reader.onload = event => {
 			const dataUrl = event.target?.result as string
+
+			if (dataUrl.length > 65534) {
+				setError(true)
+				setErrorMessage('Insira uma imagem menor')
+				return
+			}
 
 			setImgUrl(dataUrl)
 			setShowImg(true)
 		}
 
-		reader.readAsDataURL(file)
+		reader.readAsDataURL(fileCompressed)
+
+		console.log(imgUrl)
 	}
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 
 		const title = titleRef.current?.value
@@ -84,7 +153,31 @@ export default function Create() {
 
 		setIsLoading(true)
 		setShowImg(false)
-		// fetch post api
+
+		const apiUrl = props.apiUrl as unknown as string
+
+		const url = `${apiUrl}/Post/Create`
+
+		try {
+			const res = await fetch(url, {
+				method: 'post',
+				body: JSON.stringify(payload),
+				headers: { 'Content-Type': 'application/json' },
+			})
+
+			if (!res.ok) {
+				setGeneralError()
+				return
+			}
+
+			const json = await res.json()
+			const post = json as IPost
+
+			router.push(`/post/${post.id}`)
+		} catch (e) {
+			setGeneralError()
+			return
+		}
 	}
 
 	return (
@@ -141,6 +234,13 @@ export default function Create() {
 			</form>
 		</div>
 	)
+}
+
+export const getServerSideProps: GetServerSideProps<{
+	apiUrl: string | undefined
+}> = async context => {
+	const apiUrl = process.env.API_URL
+	return { props: { apiUrl } }
 }
 
 const Input = React.forwardRef<HTMLInputElement, { label: string; id: string }>(

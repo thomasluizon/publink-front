@@ -1,21 +1,22 @@
+import IPost from '@/interfaces/IPost'
 import ImagePost from '@/models/ImagePost'
 import Image from 'next/image'
 import Link from 'next/link'
 
 interface IProps {
-	img: ImagePost
+	post: IPost
 	imgWidth?: number
 }
 
-export default function PostImage({ img, imgWidth }: IProps) {
+export default function PostImage({ post, imgWidth }: IProps) {
 	const width = imgWidth || 300
 
 	return (
-		<Link href={img.postUrl} key={img.url} className="mx-auto">
+		<Link href={`/post/${post.id}`} className="mx-auto">
 			<Image
 				className="rounded-full z-0 hover:scale-105 transition-all"
-				src={img.url}
-				alt={img.alt}
+				src={post.imgUrl}
+				alt={post.description}
 				width={width}
 				height={width}
 				draggable={false}
