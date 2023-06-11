@@ -18,7 +18,7 @@ export default function Post({
 	const title = 'Publink'
 
 	// States
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const { isLoggedIn } = useContext(AuthContext)
 
 	useEffect(() => {
 		if (!isLoggedIn) {

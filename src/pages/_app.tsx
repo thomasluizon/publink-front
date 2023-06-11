@@ -5,16 +5,25 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
 	const router = useRouter()
 
-	const [isLoggedIn, setLoggedIn] = useState(false)
+	const [isLoggedIn, setLoggedIn] = useState(true)
+
+	useEffect(() => {
+		const storedLoggedIn = localStorage.getItem('isLoggedIn')
+
+		if (!storedLoggedIn) {
+			setLoggedIn(false)
+		}
+	}, [])
 
 	const title = 'Publink'
 
 	const handleLogout = () => {
+		localStorage.removeItem('isLoggedIn')
 		setLoggedIn(false)
 		router.push('/login')
 	}

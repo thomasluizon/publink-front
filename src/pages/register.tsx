@@ -12,7 +12,7 @@ export default function Register() {
 	const passwordRef = useRef<HTMLInputElement>(null)
 
 	// States
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const { isLoggedIn } = useContext(AuthContext)
 
 	// Functions
 	const handleSubmit = (event: FormEvent) => {

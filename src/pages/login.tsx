@@ -48,6 +48,7 @@ export default function Register(props: {
 			return
 		}
 
+		localStorage.setItem('isLoggedIn', 'true')
 		setLoggedIn(true)
 		setError(false)
 
