@@ -3,44 +3,9 @@ import ImageModel from '@/components/ImageModel'
 import IPost from '@/interfaces/IPost'
 import { useRouter } from 'next/router'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-
-const compressImage = async (
-	file: File,
-	{ quality, type } = { quality: 1, type: file.type }
-) => {
-	const imageBitmap = await createImageBitmap(file)
-	const canvas = document.createElement('canvas')
-
-	let width = imageBitmap.width
-	let height = imageBitmap.height
-
-	const maxWidth = 1280
-	const maxHeight = 720
-
-	if (width > maxWidth) {
-		let percentage = (maxWidth * 100) / width / 100
-
-		width = maxWidth
-
-		height *= percentage
-	} else if (height > maxHeight) {
-		let percentage = (maxHeight * 100) / height / 100
-
-		height = maxHeight
-
-		width *= percentage
-	}
-
-	canvas.width = imageBitmap.width
-	canvas.height = imageBitmap.height
-	const ctx = canvas.getContext('2d')
-
-	if (ctx == null) return
-
-	ctx.drawImage(imageBitmap, 0, 0)
-
-	return await new Promise(resolve => canvas.toBlob(resolve, type, quality))
-}
+import Input from '@/components/Input'
+import compressImage from '@/helpers/compressImage'
+import Button from '@/components/Button'
 
 export default function Create(props: {
 	apiUrl: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -55,8 +20,10 @@ export default function Create(props: {
 	// States
 	const [error, setError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
+
 	const [showImg, setShowImg] = useState(false)
 	const [imgUrl, setImgUrl] = useState('/a')
+
 	const [isLoading, setIsLoading] = useState(false)
 
 	const imgWidth = 450
@@ -219,12 +186,7 @@ export default function Create(props: {
 					hidden={!showImg}
 				/>
 
-				<button
-					disabled={isLoading}
-					className="border-2 p-2 rounded-xl hover:bg-logo hover:text-white hover:border-logo transition-colors disabled:hover:bg-red-600"
-				>
-					Enviar
-				</button>
+				<Button>Enviar</Button>
 			</form>
 		</div>
 	)
@@ -243,18 +205,3 @@ interface IPayload {
 	description: string
 	imgUrl: string
 }
-
-// Components
-const Input = React.forwardRef<HTMLInputElement, { label: string; id: string }>(
-	({ label, id }, ref) => (
-		<input
-			className="outline-none border-2 rounded-xl border-gray-300 flex-1 p-4 text-center"
-			type="text"
-			id={id}
-			ref={ref}
-			placeholder={label}
-		/>
-	)
-)
-
-Input.displayName = 'Input'
