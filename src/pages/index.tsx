@@ -1,32 +1,56 @@
+import ImageModel from '@/components/ImageModel'
+import PostImage from '@/components/PostImage'
+import AuthContext from '@/context/AuthContext'
+import logout from '@/helpers/logout'
+import useAuth from '@/hooks/useAuth'
+import IPost from '@/interfaces/IPost'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
-import PostImage from '@/components/PostImage'
-import ImageModel from '@/components/ImageModel'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import fetch from 'node-fetch'
-import https from 'https'
-import IPost from '@/interfaces/IPost'
-import { use, useContext, useEffect } from 'react'
-import AuthContext from '@/context/AuthContext'
 import { useRouter } from 'next/router'
+import { useContext, useEffect, useState } from 'react'
 
-export default function Home(props: {
-	posts: InferGetServerSidePropsType<typeof getServerSideProps>
-}) {
+export default function Home({
+	apiUrl,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	useAuth()
 	const router = useRouter()
-
 	const imageWidth = 300
-	const posts = (props?.posts || []) as unknown as IPost[]
+	const { isLoggedIn, setLoggedIn, setUser } = useContext(AuthContext)
 
 	// States
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const [posts, setPosts] = useState<IPost[]>([])
 
 	useEffect(() => {
-		if (!isLoggedIn) {
-			router.push('/login')
-		}
-	}, [isLoggedIn, router])
+		const fetchPosts = async () => {
+			if (!isLoggedIn) return
 
+			const url = `${apiUrl}/Post/GetAllRandomPosts`
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(url, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (res.status === 401) {
+				logout(router, setLoggedIn)
+				return
+			}
+
+			const json = await res.json()
+
+			if (!res.ok) {
+				console.error(json)
+			}
+
+			const posts = json as IPost[]
+			setPosts(posts)
+		}
+
+		fetchPosts()
+	}, [apiUrl, router, isLoggedIn, setLoggedIn, setUser])
 	return (
 		<>
 			<Head>
@@ -63,25 +87,9 @@ export default function Home(props: {
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	posts: IPost[]
+	apiUrl: string
 }> = async context => {
-	const url = `${process.env.API_URL}/Post/GetAllRandomPosts`
+	const apiUrl = process.env.API_URL as string
 
-	try {
-		const agent = new https.Agent({
-			rejectUnauthorized: false,
-		})
-
-		const res = await fetch(url, { agent })
-
-		const json = await res.json()
-
-		const posts = json as IPost[]
-
-		return { props: { posts } }
-	} catch (error) {
-		console.error('Error fetching data:', error)
-
-		return { props: { posts: [] } }
-	}
+	return { props: { apiUrl } }
 }

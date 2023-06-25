@@ -1,23 +1,19 @@
-import React, {
-	ChangeEvent,
-	FormEvent,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from 'react'
-import ImageModel from '@/components/ImageModel'
-import IPost from '@/interfaces/IPost'
-import { useRouter } from 'next/router'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import Input from '@/components/Input'
-import compressImage from '@/helpers/compressImage'
 import Button from '@/components/Button'
+import ImageModel from '@/components/ImageModel'
+import Input from '@/components/Input'
 import AuthContext from '@/context/AuthContext'
+import compressImage from '@/helpers/compressImage'
+import logout from '@/helpers/logout'
+import useAuth from '@/hooks/useAuth'
+import IPost from '@/interfaces/IPost'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { useRouter } from 'next/router'
+import { ChangeEvent, FormEvent, useContext, useRef, useState } from 'react'
 
-export default function Create(props: {
-	apiUrl: InferGetServerSidePropsType<typeof getServerSideProps>
-}) {
+export default function Create({
+	apiUrl,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	useAuth()
 	const router = useRouter()
 
 	// Refs
@@ -33,7 +29,7 @@ export default function Create(props: {
 	const [imgUrl, setImgUrl] = useState('/a')
 
 	const [isLoading, setIsLoading] = useState(false)
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const { setLoggedIn } = useContext(AuthContext)
 
 	const imgWidth = 450
 
@@ -87,6 +83,46 @@ export default function Create(props: {
 		reader.readAsDataURL(fileCompressed)
 	}
 
+	const handleFetch = async (title: string, description: string) => {
+		const payload: IPayload = {
+			title,
+			description,
+			imgUrl,
+		}
+
+		const url = `${apiUrl}/Post/Create`
+
+		try {
+			const token = localStorage.getItem('token')
+
+			const res = await fetch(url, {
+				method: 'post',
+				body: JSON.stringify(payload),
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (res.status === 401) {
+				logout(router, setLoggedIn)
+			}
+
+			if (!res.ok) {
+				setGeneralError()
+				return
+			}
+
+			const json = await res.json()
+			const post = json as IPost
+
+			router.push(`/post/${post.id}`)
+		} catch (e) {
+			setGeneralError()
+			return
+		}
+	}
+
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 
@@ -111,47 +147,11 @@ export default function Create(props: {
 		}
 
 		setError(false)
-
-		const payload: IPayload = {
-			title,
-			description,
-			imgUrl,
-		}
-
 		setIsLoading(true)
 		setShowImg(false)
 
-		const apiUrl = props.apiUrl as unknown as string
-
-		const url = `${apiUrl}/Post/Create`
-
-		try {
-			const res = await fetch(url, {
-				method: 'post',
-				body: JSON.stringify(payload),
-				headers: { 'Content-Type': 'application/json' },
-			})
-
-			if (!res.ok) {
-				setGeneralError()
-				return
-			}
-
-			const json = await res.json()
-			const post = json as IPost
-
-			router.push(`/post/${post.id}`)
-		} catch (e) {
-			setGeneralError()
-			return
-		}
+		await handleFetch(title, description)
 	}
-
-	useEffect(() => {
-		if (!isLoggedIn) {
-			router.push('/login')
-		}
-	}, [isLoggedIn, router])
 
 	return (
 		<div className="flex flex-col justify-center items-center h-3/4 gap-11">
@@ -211,6 +211,7 @@ export const getServerSideProps: GetServerSideProps<{
 	apiUrl: string | undefined
 }> = async context => {
 	const apiUrl = process.env.API_URL
+
 	return { props: { apiUrl } }
 }
 
