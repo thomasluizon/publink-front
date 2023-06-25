@@ -2,7 +2,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 import AuthContext from '@/context/AuthContext'
 import { useRouter } from 'next/router'
-import React, { FormEvent, useContext, useEffect, useRef } from 'react'
+import { FormEvent, useContext, useRef } from 'react'
 
 export default function Register() {
 	const router = useRouter()
@@ -12,7 +12,7 @@ export default function Register() {
 	const passwordRef = useRef<HTMLInputElement>(null)
 
 	// States
-	const { isLoggedIn } = useContext(AuthContext)
+	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
 
 	// Functions
 	const handleSubmit = (event: FormEvent) => {
@@ -23,13 +23,9 @@ export default function Register() {
 		if (passwordRef.current) passwordRef.current.value = ''
 
 		alert('Função de registrar não está funcionando no momento!')
-	}
 
-	useEffect(() => {
-		if (isLoggedIn) {
-			router.push('/')
-		}
-	}, [isLoggedIn, router])
+		router.push('/login')
+	}
 
 	return (
 		<div className="h-3/4 flex justify-center items-center">

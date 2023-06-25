@@ -1,30 +1,24 @@
 import ImageModel from '@/components/ImageModel'
 import AuthContext from '@/context/AuthContext'
+import logout from '@/helpers/logout'
+import IUser from '@/interfaces/IUser'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
 	const router = useRouter()
 
-	const [isLoggedIn, setLoggedIn] = useState(true)
-
-	useEffect(() => {
-		const storedLoggedIn = localStorage.getItem('isLoggedIn')
-
-		if (!storedLoggedIn) {
-			setLoggedIn(false)
-		}
-	}, [])
+	const [isLoggedIn, setLoggedIn] = useState(false)
+	const [user, setUser] = useState<IUser>({})
 
 	const title = 'Publink'
 
 	const handleLogout = () => {
-		localStorage.removeItem('isLoggedIn')
-		setLoggedIn(false)
+		logout(router, setLoggedIn)
 		router.push('/login')
 	}
 
@@ -39,7 +33,9 @@ export default function App({ Component, pageProps }: AppProps) {
 				<link rel="icon" href="/imgs/favicon.png" />
 				<title>{title}</title>
 			</Head>
-			<AuthContext.Provider value={{ isLoggedIn, setLoggedIn }}>
+			<AuthContext.Provider
+				value={{ isLoggedIn, setLoggedIn, user, setUser }}
+			>
 				<header className="flex p-5 justify-between items-center container mx-auto">
 					<div className="flex items-center">
 						<Link href="/">
@@ -57,7 +53,10 @@ export default function App({ Component, pageProps }: AppProps) {
 								<Link href="/login">Login</Link>
 							</>
 						) : (
-							<button onClick={handleLogout}>Sair</button>
+							<>
+								<span>Olá, {user?.username || 'User'}</span>
+								<button onClick={handleLogout}>Sair</button>
+							</>
 						)}
 					</div>
 				</header>

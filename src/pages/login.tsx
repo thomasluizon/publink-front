@@ -1,20 +1,14 @@
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 import AuthContext from '@/context/AuthContext'
+import IUser from '@/interfaces/IUser'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { useRouter } from 'next/router'
-import React, {
-	FormEvent,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from 'react'
+import { FormEvent, useContext, useEffect, useRef, useState } from 'react'
 
-export default function Register(props: {
-	correctLogin: InferGetServerSidePropsType<typeof getServerSideProps>
-	correctPassword: InferGetServerSidePropsType<typeof getServerSideProps>
-}) {
+export default function Register({
+	apiUrl,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const router = useRouter()
 
 	// Refs
@@ -24,32 +18,74 @@ export default function Register(props: {
 	// States
 	const [error, setError] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const { isLoggedIn, setLoggedIn, setUser } = useContext(AuthContext)
 
 	// Functions
-	const handleSubmit = (event: FormEvent) => {
+	const setGeneralLoginError = (message?: string) => {
+		if (!emailRef.current || !passwordRef.current) return
+
+		setError(true)
+		setErrorMessage(message || 'Email ou senha inválido(a).')
+
+		emailRef.current.value = ''
+		passwordRef.current.value = ''
+	}
+
+	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault()
 
 		if (!emailRef.current || !passwordRef.current) return
 
+		const url = `${apiUrl}/Auth/Authenticate`
+
 		const login = emailRef.current.value
 		const password = passwordRef.current.value
 
-		const correctLogin = props.correctLogin as unknown as string
-		const correctPassword = props.correctPassword as unknown as string
-
-		if (login !== correctLogin || password !== correctPassword) {
+		if (login === '' || password === '') {
 			setError(true)
-			setErrorMessage('Email ou senha inválido(a).')
-
-			emailRef.current.value = ''
-			passwordRef.current.value = ''
-
+			setErrorMessage('Insira um login e uma senha válida')
 			return
 		}
 
-		localStorage.setItem('isLoggedIn', 'true')
+		const payload = {
+			email: login,
+			password,
+		}
+
+		const res = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(payload),
+			headers: {
+				'Content-type': 'application/json',
+				Accept: 'application/json',
+			},
+		})
+
+		if (res.status == 404) {
+			setGeneralLoginError()
+			return
+		}
+
+		if (!res.ok) {
+			setGeneralLoginError('Erro no servidor - Tente novamente mais tarde.')
+			return
+		}
+
+		const json = await res.json()
+
+		const loginResponse = json as ILoginResponse
+
+		localStorage.setItem('token', loginResponse.token)
+		localStorage.setItem('username', loginResponse.user.username as string)
+		localStorage.setItem('id', loginResponse.user.id as string)
+
+		const user: IUser = {
+			id: localStorage.getItem('id') as string,
+			username: localStorage.getItem('username') as string,
+		}
+
 		setLoggedIn(true)
+		setUser(user)
 		setError(false)
 
 		emailRef.current.value = ''
@@ -92,11 +128,15 @@ export default function Register(props: {
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	correctLogin: string | undefined
-	correctPassword: string | undefined
+	apiUrl: string
 }> = async context => {
-	const login = process.env.LOGIN
-	const password = process.env.PASSWORD
+	const apiUrl = process.env.API_URL as string
 
-	return { props: { correctLogin: login, correctPassword: password } }
+	return { props: { apiUrl } }
+}
+
+// Interfaces
+interface ILoginResponse {
+	token: string
+	user: IUser
 }
