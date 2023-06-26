@@ -1,17 +1,7 @@
-# publink-front
+# Publink
 
-🖼️ Front-End do projeto Publink - Typescript - React
+![GitHub](https://img.shields.io/github/license/thomasluizon/publink-front)
 
-## Integrantes
-
--  Thomas Luizon Rodrigues Gregorio
--  Mariana Oliveira Ferreira
--  Mayumi Melo Oshiro
-
-#
-
-Demo:
-
-##
+🖼️ Publink - The social media for independent artists
 
 ![Screenshot](./public/imgs/Publink.jpeg)
