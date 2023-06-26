@@ -40,20 +40,19 @@ export default function Register({
 
 		if (!emailRef.current || !passwordRef.current) return
 
-		const url = `${apiUrl}/Auth/Authenticate`
-
-		const login = emailRef.current.value
+		const email = emailRef.current.value
 		const password = passwordRef.current.value
 
-		if (login === '' || password === '') {
-			setError(true)
-			setErrorMessage('Insira um login e uma senha válida')
+		if (email === '' || password === '') {
+			setGeneralLoginError('Insira um login e uma senha válida')
 			return
 		}
 
+		const url = `${apiUrl}/Auth/Authenticate`
+
 		const payload = {
-			email: login,
-			password: password,
+			email,
+			password,
 		}
 
 		setIsLoading(true)
