@@ -1,8 +1,10 @@
 import Button from '@/components/Button'
+import ErrorBox from '@/components/ErrorBox'
 import Input from '@/components/Input'
+import Loader from '@/components/Loader'
 import AuthContext from '@/context/AuthContext'
 import { useRouter } from 'next/router'
-import { FormEvent, useContext, useRef } from 'react'
+import { FormEvent, useContext, useRef, useState } from 'react'
 
 export default function Register() {
 	const router = useRouter()
@@ -12,6 +14,9 @@ export default function Register() {
 	const passwordRef = useRef<HTMLInputElement>(null)
 
 	// States
+	const [error, setError] = useState(false)
+	const [errorMessage, setErrorMessage] = useState('')
+	const [isLoading, setIsLoading] = useState(false)
 	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
 
 	// Functions
@@ -42,6 +47,10 @@ export default function Register() {
 				/>
 
 				<Button>Registrar</Button>
+
+				{isLoading ? <Loader /> : false}
+
+				{error ? <ErrorBox>{errorMessage}</ErrorBox> : false}
 			</form>
 		</div>
 	)
