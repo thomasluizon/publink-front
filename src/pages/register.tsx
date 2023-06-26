@@ -1,30 +1,101 @@
 import Button from '@/components/Button'
+import ErrorBox from '@/components/ErrorBox'
 import Input from '@/components/Input'
+import Loader from '@/components/Loader'
 import AuthContext from '@/context/AuthContext'
+import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
-import { FormEvent, useContext, useRef } from 'react'
+import { FormEvent, useContext, useRef, useState } from 'react'
 
-export default function Register() {
+export default function Register({
+	apiUrl,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const router = useRouter()
 
 	// Refs
 	const emailRef = useRef<HTMLInputElement>(null)
+	const usernameRef = useRef<HTMLInputElement>(null)
 	const passwordRef = useRef<HTMLInputElement>(null)
 
 	// States
-	const { isLoggedIn, setLoggedIn } = useContext(AuthContext)
+	const [error, setError] = useState(false)
+	const [errorMessage, setErrorMessage] = useState('')
+	const [isLoading, setIsLoading] = useState(false)
+	const [isSuccess, setIsSuccess] = useState(false)
 
 	// Functions
-	const handleSubmit = (event: FormEvent) => {
+	const setGeneralRegisterError = (message?: string) => {
+		if (!emailRef.current || !passwordRef.current || !usernameRef.current)
+			return
+
+		setError(true)
+		setErrorMessage(message || 'Email ou senha inválido(a).')
+
+		usernameRef.current.value = ''
+		emailRef.current.value = ''
+		passwordRef.current.value = ''
+	}
+
+	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault()
 
-		if (emailRef.current) emailRef.current.value = ''
+		if (!passwordRef.current || !emailRef.current || !usernameRef.current)
+			return
 
-		if (passwordRef.current) passwordRef.current.value = ''
+		const username = usernameRef.current.value
+		const email = emailRef.current.value
+		const password = passwordRef.current.value
 
-		alert('Função de registrar não está funcionando no momento!')
+		if (username === '' || email === '' || password === '') {
+			setGeneralRegisterError(
+				'Insira um nome de usuário, um login e uma senha válida'
+			)
+		}
 
-		router.push('/login')
+		const url = `${apiUrl}/Auth/Register`
+
+		const payload = {
+			username,
+			email,
+			password,
+		}
+
+		setIsLoading(true)
+
+		const serverError = 'Erro no servidor - Tente novamente mais tarde.'
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				body: JSON.stringify(payload),
+				headers: {
+					'Content-type': 'application/json',
+					Accept: 'application/json',
+				},
+			})
+
+			setIsLoading(false)
+
+			if (res.status === 400) {
+				setGeneralRegisterError('Usuário já registrado')
+				return
+			}
+
+			if (!res.ok) {
+				setGeneralRegisterError(serverError)
+				return
+			}
+
+			setIsSuccess(true)
+			setIsLoading(true)
+			setError(false)
+
+			setTimeout(() => {
+				router.push('/login')
+			}, 3000)
+		} catch (error) {
+			setGeneralRegisterError(serverError)
+		}
 	}
 
 	return (
@@ -33,6 +104,7 @@ export default function Register() {
 				className="flex flex-col max-w-xl mx-auto gap-5"
 				onSubmit={handleSubmit}
 			>
+				<Input id="username" label="Nome" ref={usernameRef} type="text" />
 				<Input id="email" label="Email" ref={emailRef} type="email" />
 				<Input
 					id="password"
@@ -42,7 +114,26 @@ export default function Register() {
 				/>
 
 				<Button>Registrar</Button>
+
+				{isLoading ? <Loader /> : false}
+				{isSuccess ? (
+					<div className="text-green-600 border-2 p-3 rounded-xl border-green-600">
+						Registrado com sucesso! Você será redirecionado para a tela de
+						login.
+					</div>
+				) : (
+					false
+				)}
+				{error ? <ErrorBox>{errorMessage}</ErrorBox> : false}
 			</form>
 		</div>
 	)
+}
+
+export const getServerSideProps: GetServerSideProps<{
+	apiUrl: string
+}> = async context => {
+	const apiUrl = process.env.API_URL as string
+
+	return { props: { apiUrl } }
 }

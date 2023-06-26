@@ -1,6 +1,8 @@
 import Button from '@/components/Button'
+import ErrorBox from '@/components/ErrorBox'
 import ImageModel from '@/components/ImageModel'
 import Input from '@/components/Input'
+import Loader from '@/components/Loader'
 import AuthContext from '@/context/AuthContext'
 import compressImage from '@/helpers/compressImage'
 import logout from '@/helpers/logout'
@@ -166,33 +168,14 @@ export default function Create({
 			<form className="flex flex-col gap-5" onSubmit={handleSubmit}>
 				<Input id="title" label="Titulo" ref={titleRef} />
 				<Input id="desc" label="Descrição" ref={descRef} />
-				<button
-					type="button"
-					className="border-2 rounded-xl px-5 py-14 border-gray-400 hover:bg-logo hover:text-white hover:border-logo transition-colors"
-					onClick={() => fileInput.current?.click()}
-				>
+
+				<Button isButton onClick={() => fileInput.current?.click()}>
 					Clique aqui para selecionar um arquivo (png ou jpeg)
-				</button>
+				</Button>
 
-				{error ? (
-					<div className="text-red-600 border-2 p-3 rounded-xl border-red-600">
-						{errorMessage}
-					</div>
-				) : (
-					false
-				)}
+				{error ? <ErrorBox>{errorMessage}</ErrorBox> : false}
 
-				{isLoading ? (
-					<div className="flex items-center justify-center p-3">
-						<div className="flex space-x-2 animate-pulse">
-							<div className="w-3 h-3 bg-logo rounded-full"></div>
-							<div className="w-3 h-3 bg-logo rounded-full"></div>
-							<div className="w-3 h-3 bg-logo rounded-full"></div>
-						</div>
-					</div>
-				) : (
-					false
-				)}
+				{isLoading ? <Loader /> : false}
 
 				<ImageModel
 					imgWidth={imgWidth}

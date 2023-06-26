@@ -74,6 +74,7 @@ export default function Post({
 
 			setPost(post)
 		}
+
 		fetchPost()
 	}, [apiUrl, id, router, setLoggedIn])
 
@@ -81,7 +82,7 @@ export default function Post({
 		<>
 			<Head>
 				<title>
-					{title} - {post.title}
+					{title} - {post.title || 'Imagem'}
 				</title>
 			</Head>
 			<div className="flex flex-col justify-center items-center h-3/4 gap-11">

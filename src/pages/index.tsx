@@ -16,6 +16,7 @@ export default function Home({
 	useAuth()
 	const router = useRouter()
 	const imageWidth = 300
+
 	const { isLoggedIn, setLoggedIn, setUser } = useContext(AuthContext)
 
 	// States
@@ -46,6 +47,7 @@ export default function Home({
 			}
 
 			const posts = json as IPost[]
+
 			setPosts(posts)
 		}
 
