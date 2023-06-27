@@ -2,6 +2,7 @@ import Button from '@/components/Button'
 import ErrorBox from '@/components/ErrorBox'
 import Input from '@/components/Input'
 import Loader from '@/components/Loader'
+import SuccessBox from '@/components/SuccessBox'
 import AuthContext from '@/context/AuthContext'
 import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
@@ -116,14 +117,16 @@ export default function Register({
 				<Button>Registrar</Button>
 
 				{isLoading ? <Loader /> : false}
+
 				{isSuccess ? (
-					<div className="text-green-600 border-2 p-3 rounded-xl border-green-600">
+					<SuccessBox>
 						Registrado com sucesso! Você será redirecionado para a tela de
 						login.
-					</div>
+					</SuccessBox>
 				) : (
 					false
 				)}
+
 				{error ? <ErrorBox>{errorMessage}</ErrorBox> : false}
 			</form>
 		</div>
