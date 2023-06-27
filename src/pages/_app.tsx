@@ -1,4 +1,5 @@
 import ImageModel from '@/components/ImageModel'
+import Warning from '@/components/Warning'
 import AuthContext from '@/context/AuthContext'
 import logout from '@/helpers/logout'
 import IUser from '@/interfaces/IUser'
@@ -36,6 +37,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			<AuthContext.Provider
 				value={{ isLoggedIn, setLoggedIn, user, setUser }}
 			>
+				<Warning />
 				<header className="flex p-5 justify-between items-center container mx-auto">
 					<div className="flex items-center">
 						<Link href="/">

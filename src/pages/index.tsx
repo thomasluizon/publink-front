@@ -29,26 +29,30 @@ export default function Home({
 			const url = `${apiUrl}/Post/GetAllRandomPosts`
 			const token = localStorage.getItem('token')
 
-			const res = await fetch(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
+			try {
+				const res = await fetch(url, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
 
-			if (res.status === 401) {
-				logout(router, setLoggedIn)
-				return
+				if (res.status === 401) {
+					logout(router, setLoggedIn)
+					return
+				}
+
+				const json = await res.json()
+
+				if (!res.ok) {
+					console.error(json)
+				}
+
+				const posts = json as IPost[]
+
+				setPosts(posts)
+			} catch (error) {
+				console.error(error)
 			}
-
-			const json = await res.json()
-
-			if (!res.ok) {
-				console.error(json)
-			}
-
-			const posts = json as IPost[]
-
-			setPosts(posts)
 		}
 
 		fetchPosts()

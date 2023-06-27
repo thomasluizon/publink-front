@@ -31,6 +31,8 @@ export default function Register({
 
 		setError(true)
 		setErrorMessage(message || 'Email ou senha inválido(a).')
+		setIsLoading(false)
+		setIsSuccess(false)
 
 		usernameRef.current.value = ''
 		emailRef.current.value = ''
@@ -51,6 +53,7 @@ export default function Register({
 			setGeneralRegisterError(
 				'Insira um nome de usuário, um login e uma senha válida'
 			)
+			return
 		}
 
 		const url = `${apiUrl}/Auth/Register`
