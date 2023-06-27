@@ -4,4 +4,4 @@
 
 🖼️ Publink - The social media for independent artists
 
-![Screenshot](./public/imgs/Publink.jpeg)
+![Screenshot](./screenshot.jpeg)
