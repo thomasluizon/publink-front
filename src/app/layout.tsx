@@ -3,18 +3,12 @@
 import Header from '@/components/Header'
 import AuthContext from '@/context/AuthContext'
 import logout from '@/helpers/logout'
-import { User } from '@/types/User'
 import '@/styles/globals.css'
-import { Metadata } from 'next'
+import { User } from '@/types/User'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const title = 'Publink'
-
-export const metadata: Metadata = {
-	title: `${title} - Feed`,
-	description: 'Bem vindo ao publink',
-}
 
 export default function RootLayout({
 	children,

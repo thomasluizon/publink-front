@@ -8,13 +8,8 @@ import AuthContext from '@/context/AuthContext'
 import loginFunction from '@/helpers/loginFunction'
 import { BaseResponse } from '@/types/BaseResponse'
 import { User } from '@/types/User'
-import { Metadata } from 'next'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useContext, useRef, useState } from 'react'
-
-export const metadata: Metadata = {
-	title: 'Publink - Login',
-}
 
 type LoginResponse = {
 	token: string
