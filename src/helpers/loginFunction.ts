@@ -1,12 +1,12 @@
-import IUser from '@/types/User'
+import { User } from '@/types/User'
 
 export default function loginFunction(
 	token: string,
 	username: string,
 	id: string,
 	setLoggedIn: (value: boolean) => void,
-	setUser: (value: IUser) => void,
-	user: IUser
+	setUser: (value: User) => void,
+	user: User
 ) {
 	localStorage.setItem('token', token)
 	localStorage.setItem('username', username)
