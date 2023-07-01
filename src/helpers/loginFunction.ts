@@ -1,4 +1,4 @@
-import IUser from '@/interfaces/IUser'
+import IUser from '@/types/User'
 
 export default function loginFunction(
 	token: string,

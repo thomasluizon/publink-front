@@ -1,7 +1,7 @@
-import { NextRouter } from 'next/router'
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context'
 
 export default function logout(
-	router: NextRouter,
+	router: AppRouterInstance,
 	setLoggedIn: (value: boolean) => void
 ) {
 	localStorage.removeItem('token')

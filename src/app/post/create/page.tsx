@@ -1,3 +1,5 @@
+'use client'
+
 import Button from '@/components/Button'
 import ErrorBox from '@/components/ErrorBox'
 import ImageModel from '@/components/ImageModel'
@@ -7,15 +9,52 @@ import AuthContext from '@/context/AuthContext'
 import compressImage from '@/helpers/compressImage'
 import logout from '@/helpers/logout'
 import useAuth from '@/hooks/useAuth'
-import IPost from '@/interfaces/IPost'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { useRouter } from 'next/router'
+import { BaseResponse } from '@/types/BaseResponse'
+import { Post } from '@/types/Post'
+import { useRouter } from 'next/navigation'
 import { ChangeEvent, FormEvent, useContext, useRef, useState } from 'react'
 
-export default function Create({
-	apiUrl,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+type Payload = {
+	title: string
+	description: string
+	imgUrl: string
+}
+
+async function create(payload: Payload): Promise<BaseResponse<Post>> {
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL
+	const url = `${apiUrl}/Post/Create`
+
+	const token = localStorage.getItem('token')
+
+	const res = await fetch(url, {
+		method: 'post',
+		body: JSON.stringify(payload),
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+	})
+
+	if (res.status === 401) {
+		return {
+			error: 'auth',
+		}
+	}
+
+	if (!res.ok) {
+		return {
+			error: 'server',
+		}
+	}
+
+	return {
+		data: await res.json(),
+	}
+}
+
+export default function Create() {
 	useAuth()
+
 	const router = useRouter()
 
 	// Refs
@@ -86,42 +125,25 @@ export default function Create({
 	}
 
 	const handleFetch = async (title: string, description: string) => {
-		const payload: IPayload = {
+		const payload: Payload = {
 			title,
 			description,
 			imgUrl,
 		}
 
-		const url = `${apiUrl}/Post/Create`
+		const res = await create(payload)
 
-		try {
-			const token = localStorage.getItem('token')
+		if (res.error === 'auth') {
+			logout(router, setLoggedIn)
+		}
 
-			const res = await fetch(url, {
-				method: 'post',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			if (res.status === 401) {
-				logout(router, setLoggedIn)
-			}
-
-			if (!res.ok) {
-				setGeneralError()
-				return
-			}
-
-			const json = await res.json()
-			const post = json as IPost
-
-			router.push(`/post/${post.id}`)
-		} catch (e) {
+		if (res.error === 'server') {
 			setGeneralError()
 			return
+		}
+
+		if (res.data) {
+			router.push(`/post/${res.data.id}`)
 		}
 	}
 
@@ -188,19 +210,4 @@ export default function Create({
 			</form>
 		</div>
 	)
-}
-
-export const getServerSideProps: GetServerSideProps<{
-	apiUrl: string | undefined
-}> = async context => {
-	const apiUrl = process.env.API_URL
-
-	return { props: { apiUrl } }
-}
-
-// Interfaces
-interface IPayload {
-	title: string
-	description: string
-	imgUrl: string
 }

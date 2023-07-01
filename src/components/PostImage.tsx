@@ -1,8 +1,13 @@
-import IPost from '@/interfaces/IPost'
+import { Post } from '@/types/Post'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function PostImage({ post, imgWidth }: IProps) {
+type Props = {
+	post: Post
+	imgWidth?: number
+}
+
+export default function PostImage({ post, imgWidth }: Props) {
 	const width = imgWidth || 300
 
 	return (
@@ -21,10 +26,4 @@ export default function PostImage({ post, imgWidth }: IProps) {
 			/>
 		</Link>
 	)
-}
-
-// Interfaces
-interface IProps {
-	post: IPost
-	imgWidth?: number
 }
