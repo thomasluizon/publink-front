@@ -1,4 +1,4 @@
-export default interface IUser {
+export type User = {
 	username?: string
 	email?: string
 	id?: string

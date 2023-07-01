@@ -1,16 +1,48 @@
+'use client'
+
 import Button from '@/components/Button'
 import ErrorBox from '@/components/ErrorBox'
 import Input from '@/components/Input'
 import Loader from '@/components/Loader'
 import SuccessBox from '@/components/SuccessBox'
-import AuthContext from '@/context/AuthContext'
-import { InferGetServerSidePropsType, GetServerSideProps } from 'next'
-import { useRouter } from 'next/router'
-import { FormEvent, useContext, useRef, useState } from 'react'
+import { BaseResponse } from '@/types/BaseResponse'
+import { useRouter } from 'next/navigation'
+import { FormEvent, useRef, useState } from 'react'
 
-export default function Register({
-	apiUrl,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+async function register(payload: {
+	username: string
+	email: string
+	password: string
+}): Promise<BaseResponse> {
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+	const url = `${apiUrl}/Auth/Register`
+
+	const res = await fetch(url, {
+		method: 'POST',
+		body: JSON.stringify(payload),
+		headers: {
+			'Content-type': 'application/json',
+			Accept: 'application/json',
+		},
+	})
+
+	if (res.status === 400) {
+		return {
+			error: 'badRequest',
+		}
+	}
+
+	if (!res.ok) {
+		return {
+			error: 'server',
+		}
+	}
+
+	return {}
+}
+
+export default function Register() {
 	const router = useRouter()
 
 	// Refs
@@ -56,8 +88,6 @@ export default function Register({
 			return
 		}
 
-		const url = `${apiUrl}/Auth/Register`
-
 		const payload = {
 			username,
 			email,
@@ -68,38 +98,27 @@ export default function Register({
 
 		const serverError = 'Erro no servidor - Tente novamente mais tarde.'
 
-		try {
-			const res = await fetch(url, {
-				method: 'POST',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-type': 'application/json',
-					Accept: 'application/json',
-				},
-			})
+		const res = await register(payload)
 
-			setIsLoading(false)
+		setIsLoading(false)
 
-			if (res.status === 400) {
-				setGeneralRegisterError('Usuário já registrado')
-				return
-			}
-
-			if (!res.ok) {
-				setGeneralRegisterError(serverError)
-				return
-			}
-
-			setIsSuccess(true)
-			setIsLoading(true)
-			setError(false)
-
-			setTimeout(() => {
-				router.push('/login')
-			}, 3000)
-		} catch (error) {
-			setGeneralRegisterError(serverError)
+		if (res.error === 'badRequest') {
+			setGeneralRegisterError('Usuário já registrado')
+			return
 		}
+
+		if (res.error === 'server') {
+			setGeneralRegisterError(serverError)
+			return
+		}
+
+		setIsSuccess(true)
+		setIsLoading(true)
+		setError(false)
+
+		setTimeout(() => {
+			router.push('/login')
+		}, 3000)
 	}
 
 	return (
@@ -134,12 +153,4 @@ export default function Register({
 			</form>
 		</div>
 	)
-}
-
-export const getServerSideProps: GetServerSideProps<{
-	apiUrl: string
-}> = async context => {
-	const apiUrl = process.env.API_URL as string
-
-	return { props: { apiUrl } }
 }

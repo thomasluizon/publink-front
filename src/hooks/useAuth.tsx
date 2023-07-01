@@ -1,7 +1,9 @@
-import { useContext, useEffect } from 'react'
-import { useRouter } from 'next/router'
+'use client'
+
 import AuthContext from '@/context/AuthContext'
-import IUser from '@/interfaces/IUser'
+import { User } from '@/types/User'
+import { useRouter } from 'next/navigation'
+import { useContext, useEffect } from 'react'
 
 const useAuth = () => {
 	const router = useRouter()
@@ -18,7 +20,7 @@ const useAuth = () => {
 			return
 		}
 
-		const user: IUser = {
+		const user: User = {
 			id: localStorage.getItem('id') as string,
 			username: localStorage.getItem('username') as string,
 		}
@@ -26,8 +28,6 @@ const useAuth = () => {
 		setLoggedIn(true)
 		setUser(user)
 	}, [router, setLoggedIn, setUser])
-
-	return null
 }
 
 export default useAuth

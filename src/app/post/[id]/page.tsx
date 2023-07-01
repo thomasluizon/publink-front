@@ -1,17 +1,58 @@
+'use client'
+
 import ImageModel from '@/components/ImageModel'
 import AuthContext from '@/context/AuthContext'
 import logout from '@/helpers/logout'
 import useAuth from '@/hooks/useAuth'
-import IPost from '@/interfaces/IPost'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { BaseResponse } from '@/types/BaseResponse'
+import { PostAndUser } from '@/types/PostAndUser'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
 
-export default function Post({
-	id,
-	apiUrl,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+type Posts = {
+	title?: string
+	imgUrl?: string
+	imgAlt?: string
+	otherImgs?: Image[]
+}
+
+type Image = {
+	imgUrl: string
+	imgAlt: string
+	link: string
+}
+
+async function fetchPosts(id: string): Promise<BaseResponse<PostAndUser[]>> {
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL
+	const url = `${apiUrl}/Post/GetPostAndUserByIdAndRandom/${id}`
+
+	const token = localStorage.getItem('token')
+
+	const res = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	})
+
+	if (res.status === 401) {
+		return {
+			error: 'auth',
+		}
+	}
+
+	if (!res.ok) {
+		return {
+			error: 'server',
+		}
+	}
+
+	return {
+		data: await res.json(),
+	}
+}
+
+export default function Post({ params }: { params: { id: string } }) {
 	useAuth()
 	const router = useRouter()
 
@@ -20,43 +61,37 @@ export default function Post({
 	const title = 'Publink'
 
 	// State
-	const [post, setPost] = useState<IPosts>({})
+	const [post, setPost] = useState<Posts>({})
 	const { setLoggedIn } = useContext(AuthContext)
 
 	useEffect(() => {
-		const fetchPost = async () => {
-			const url = `${apiUrl}/Post/GetByIdAndRandom/${id}`
+		async function getPosts() {
+			const res = await fetchPosts(params.id)
 
-			const token = localStorage.getItem('token')
-
-			const res = await fetch(url, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			if (res.status === 401) {
+			if (res.error === 'auth') {
 				logout(router, setLoggedIn)
 				return
 			}
 
-			if (!res.ok) {
+			if (res.error === 'server') {
 				router.push('/')
 				return
 			}
 
-			const json = await res.json()
+			if (!res.data) return
 
-			const posts = json as IPost[]
+			const posts = res.data
 
-			const firstPost = posts[0]
+			const firstPost = posts[0].post
 
 			posts.shift()
 
-			const otherImages: IImage[] = []
+			const otherImages: Image[] = []
 
-			posts.forEach(post => {
-				const img: IImage = {
+			posts.forEach(postAndUser => {
+				const post = postAndUser.post
+
+				const img: Image = {
 					imgUrl: post.imgUrl,
 					imgAlt: post.description,
 					link: `/post/${post.id}`,
@@ -65,7 +100,7 @@ export default function Post({
 				otherImages.push(img)
 			})
 
-			const post: IPosts = {
+			const post: Posts = {
 				title: firstPost.title,
 				imgUrl: firstPost.imgUrl,
 				imgAlt: firstPost.description,
@@ -75,8 +110,8 @@ export default function Post({
 			setPost(post)
 		}
 
-		fetchPost()
-	}, [apiUrl, id, router, setLoggedIn])
+		getPosts()
+	}, [params.id, router, setLoggedIn])
 
 	return (
 		<>
@@ -117,28 +152,4 @@ export default function Post({
 			</div>
 		</>
 	)
-}
-
-export const getServerSideProps: GetServerSideProps<{
-	apiUrl: string
-	id: string | string[] | undefined
-}> = async context => {
-	const { id } = context.query
-	const apiUrl = process.env.API_URL as string
-
-	return { props: { id, apiUrl } }
-}
-
-// Interfaces
-interface IPosts {
-	title?: string
-	imgUrl?: string
-	imgAlt?: string
-	otherImgs?: IImage[]
-}
-
-interface IImage {
-	imgUrl: string
-	imgAlt: string
-	link: string
 }

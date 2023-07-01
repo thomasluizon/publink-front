@@ -1,11 +1,11 @@
-import IUser from '@/interfaces/IUser'
-import { createContext, useState } from 'react'
+import { User } from '@/types/User'
+import { createContext } from 'react'
 
 type AuthContextType = {
 	isLoggedIn: boolean
 	setLoggedIn: (value: boolean) => void
-	user: IUser
-	setUser: (user: IUser) => void
+	user: User
+	setUser: (user: User) => void
 }
 
 const AuthContext = createContext<AuthContextType>({
