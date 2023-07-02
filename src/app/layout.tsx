@@ -8,8 +8,6 @@ import { User } from '@/types/User'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-const title = 'Publink'
-
 export default function RootLayout({
 	children,
 }: {
